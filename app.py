@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify
 from keras.models import load_model
 from datetime import datetime
 from insertion_BDD import insertion_bdd
-from dotenv import load_dotenv
+
 
 import numpy as np
 import os
 
 app = Flask(__name__)
 
-load_dotenv()
+
 
 current_date = datetime.now().strftime("%Y-%m-%d")
 model = load_model(f"model_{current_date}.h5")

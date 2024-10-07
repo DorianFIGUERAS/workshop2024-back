@@ -14,7 +14,7 @@ def requete_bdd():
     db = client['BreastCancer']
 
     # 3. Accéder à une collection dans cette base de données (par exemple, "mycollection")
-    collection = db['test1']
+    collection = db['propre']
 
     # 4. Récupérer tous les documents de la collection
     documents = collection.find()  # Aucun filtre pour récupérer tous les documents
