@@ -1,9 +1,14 @@
 from pymongo import MongoClient
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def requete_bdd():
     # 1. Se connecter à MongoDB
     # Remplacez <username>, <password> et <host> par vos informations MongoDB
-    client = MongoClient("mongodb://admin:password@srv614232.hstgr.cloud:27017/")
+    mongo_uri = os.getenv("MONGO_URI")
+    client = MongoClient(mongo_uri)
 
     # 2. Accéder à une base de données spécifique (par exemple, "mydatabase")
     db = client['BreastCancer']
