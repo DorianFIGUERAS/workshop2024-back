@@ -7,6 +7,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.models import save_model
 from datetime import datetime
+from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 
 # Fonction pour entraîner un modèle IA avec Keras et sauvegarder en .h5
@@ -33,7 +34,7 @@ def train_model_from_mongo(target_column):
     X_scaled = scaler.fit_transform(X)
 
     # 5. Diviser les données en ensembles d'entraînement et de test
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.25, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
     
     # 6. Créer et entraîner un modèle Keras amélioré
     model = Sequential()
@@ -48,7 +49,15 @@ def train_model_from_mongo(target_column):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     # Entraîner le modèle
-    model.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_test, y_test))  # Augmentation des epochs
+    # Définir un callback pour l'arrêt anticipé
+    early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+
+    # Entraîner le modèle avec l'arrêt anticipé
+    history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), callbacks=[early_stopping])  # Augmentation des epochs
+    plt.plot(history.history['loss'], label='Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.legend()
+    plt.show()
     
     # 7. Évaluer le modèle et afficher la précision
     _, accuracy = model.evaluate(X_test, y_test)
@@ -69,6 +78,8 @@ def train_model_from_mongo(target_column):
     
     save_model(model, model_filename)
     print(f"Modèle enregistré sous le nom : {model_filename}")
+    
+
 
     # 10. Retourner le modèle entraîné
     return model
