@@ -93,7 +93,7 @@ def resultats():
     except KeyError as e:
         return jsonify({f"error": "{e}"}), 400
 
-@app.route(f'{route}/data', methods=['POST'])
+@app.route(f'{route}/data', methods=['POST', 'GET'])
 def processing_data():
     # 1. Vérifier si la requête contient des données JSON
     if not request.is_json:
@@ -119,8 +119,6 @@ def processing_data():
         region = data['region']
     except KeyError as e:
         return jsonify({"error": f"Clé manquante dans les données JSON : {e}"}), 400
-
-    
 
     # Convertir en DataFrame
     df_new = pd.DataFrame([features])
@@ -148,15 +146,16 @@ def processing_data():
         doctolib_url = f"https://www.doctolib.fr/oncologue/{region.replace(' ', '-').lower()}"
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
+    try:
+        uid = session.get('uid')
+        if uid:
+            insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d"), uid)
+        else:
+            insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d") )
+    except KeyError as e:
+        uid = None
     
-    uid = session.get('uid')
-    if uid:
-        uid_user = uid
-    else:
-        uid_user = ""
     
-    
-    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), session.get('uid'), datetime.now().strftime("%Y-%m-%d") )
     
     
     pourcentage_prediction = round(100 * float(f"{prediction[0][0]:.4f}"), 1)

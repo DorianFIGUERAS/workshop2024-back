@@ -1,4 +1,3 @@
 .env
-__pycache__
-firebase.json
+./__pycache__
 docker-compose.yml
