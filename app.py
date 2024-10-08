@@ -4,6 +4,7 @@ from datetime import datetime
 from insertion_BDD import insertion_bdd
 from connexion_firebase import authenticate_user
 from connexion_bdd_user import requete_bdd_user
+from creation_user import create_user
 
 
 import numpy as np
@@ -42,6 +43,20 @@ current_date = datetime.now().strftime("%Y%m%d")
 # Charger le modèle et le scaler
 model = load_model(f"./models/{latest_model_file}")
 scaler = joblib.load("scaler.pkl")
+
+
+@app.route('/create_user', methods=['POST'])
+def create_new_user():
+    data = request.get_json()
+    try : 
+        email = data['email']
+        password = data['password']
+        uid_new_user = create_user(email, password)
+        print("uid_new_user", uid_new_user)
+        session['uid'] = uid_new_user
+        return jsonify({"uid": uid_new_user})
+    except KeyError as e:
+        return jsonify({"error": f"Clé manquante dans les données JSON : {e}"}), 400
 
 
 @app.route('/connexion', methods=['POST', 'GET'])
