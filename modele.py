@@ -80,7 +80,7 @@ def train_model_from_mongo(target_column):
 
     # 9. Enregistrer le modèle sous format .h5 avec la date du jour
     current_date = datetime.now().strftime("%Y-%m-%d")
-    model_filename = f"model_{current_date}.h5"
+    model_filename = f"./models/model_{current_date}.h5"
     
     save_model(model, model_filename)
     print(f"Modèle enregistré sous le nom : {model_filename}")

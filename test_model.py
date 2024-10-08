@@ -2,11 +2,29 @@ import pandas as pd
 import joblib
 from keras.models import load_model
 from datetime import datetime
+import os
 
-current_date = datetime.now().strftime("%Y-%m-%d")
+# Récupérer la liste des noms des modèles dans le dossier models
+model_files = [f for f in os.listdir("./models") if f.endswith(".h5")]
+
+# Afficher la liste des modèles
+print("Liste des modèles disponibles :")
+model_name = []
+for model_file in model_files:
+    print(model_file)
+    model_name.append(model_file)
+# Trier les fichiers de modèles par date de modification (du plus récent au plus ancien)
+model_files.sort(key=lambda x: os.path.getmtime(os.path.join("./models", x)), reverse=True)
+
+# Récupérer le nom du modèle le plus récent
+latest_model_file = model_files[0]
+print(f"Le modèle le plus récent est : {latest_model_file}")
+
+# Déterminer la date actuelle pour charger le modèle correspondant
+current_date = datetime.now().strftime("%Y%m%d")
 
 # Charger le modèle et le scaler
-model = load_model(f"model_{current_date}.h5")
+model = load_model(f"./models/{latest_model_file}")
 scaler = joblib.load("scaler.pkl")
 
 # Exemple de nouvelles données
