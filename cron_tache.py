@@ -5,7 +5,7 @@ import time
 
     
 def train_model():
-    train_model_from_mongo()
+    train_model_from_mongo("Classification")
     print('entraînement du modèle terminé')
 
 # Initialiser le scheduler

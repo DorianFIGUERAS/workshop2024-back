@@ -18,7 +18,7 @@ def requete_bdd_user(uid=None):
 
     query ={}
 
-    if uid:
+    if uid!="" and uid!=None:
         query = {"uid": uid}
 
 

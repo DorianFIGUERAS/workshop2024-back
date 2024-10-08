@@ -5,6 +5,7 @@ from insertion_BDD import insertion_bdd
 from connexion_firebase import authenticate_user
 from connexion_bdd_user import requete_bdd_user
 from creation_user import create_user
+from dotenv import load_dotenv
 
 
 import numpy as np
@@ -17,7 +18,8 @@ import pandas as pd
 
 app = Flask(__name__)
 
-
+load_dotenv()
+route = os.getenv('ROUTE')
 # Définir une clé secrète pour les sessions Flask
 app.secret_key = os.urandom(24)
 
@@ -45,7 +47,7 @@ model = load_model(f"./models/{latest_model_file}")
 scaler = joblib.load("scaler.pkl")
 
 
-@app.route('/create_user', methods=['POST'])
+@app.route(f'{route}/create_user', methods=['POST'])
 def create_new_user():
     data = request.get_json()
     try : 
@@ -59,7 +61,7 @@ def create_new_user():
         return jsonify({"error": f"Clé manquante dans les données JSON : {e}"}), 400
 
 
-@app.route('/connexion', methods=['POST', 'GET'])
+@app.route(f'{route}/connexion', methods=['POST', 'GET'])
 def authenticate():
     data = request.get_json()
     try : 
@@ -74,7 +76,7 @@ def authenticate():
     except KeyError as e:
         return jsonify({"error": f"Clé manquante dans les données JSON : {e}"}), 400
 
-@app.route('/resultats', methods=['GET'])
+@app.route(f'{route}/resultats', methods=['GET'])
 def resultats():
     try : 
         uid = session.get('uid')
@@ -91,7 +93,7 @@ def resultats():
     except KeyError as e:
         return jsonify({f"error": "{e}"}), 400
 
-@app.route('/data', methods=['POST'])
+@app.route(f'{route}/data', methods=['POST'])
 def processing_data():
     # 1. Vérifier si la requête contient des données JSON
     if not request.is_json:
@@ -140,14 +142,21 @@ def processing_data():
     if predicted_class[0][0] == 0:
         prediction_text = "Vous ne semblez pas avoir de cancer. Vous pouvez tout de même consulter un médecin pour plus de sécurité."
     else:
-        prediction_text = "Vous semblez avoir potentiellement un cancer. Vous pouvez consulter un médecin pour plus de détails et de tests."
+        prediction_text = "Vous êtes suceptible d'avoir un cancer. Vous pouvez consulter un médecin pour plus de détails et de tests."
     
     if 'region' in data:
         doctolib_url = f"https://www.doctolib.fr/oncologue/{region.replace(' ', '-').lower()}"
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
     
-    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), session['uid'], datetime.now().strftime("%Y-%m-%d") )
+    uid = session.get('uid')
+    if uid:
+        uid_user = uid
+    else:
+        uid_user = ""
+    
+    
+    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), session.get('uid'), datetime.now().strftime("%Y-%m-%d") )
     
     
     pourcentage_prediction = round(100 * float(f"{prediction[0][0]:.4f}"), 1)
@@ -155,8 +164,9 @@ def processing_data():
     # 6. Retourner la prédiction sous forme de JSON
     return jsonify({"prediction": prediction_text,
                     "probabilite": f"{pourcentage_prediction} %",
-                    "doctolib_url": doctolib_url
+                    "doctolib_url": doctolib_url,
+                    "avertissement": "Ceci est une prédiction basée sur un modèle de machine learning et ne remplace pas un avis médical professionnel."
                     })  # Convertir la prédiction en liste pour JSON
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000)
