@@ -21,7 +21,7 @@ app = Flask(__name__)
 load_dotenv()
 route = os.getenv('ROUTE')
 # Définir une clé secrète pour les sessions Flask
-app.secret_key = os.urandom(24)
+app.secret_key = os.getenv('SECRET_KEY')
 
 # Récupérer la liste des noms des modèles dans le dossier models
 model_files = [f for f in os.listdir("./models") if f.endswith(".h5")]
@@ -147,9 +147,8 @@ def processing_data():
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
     try:
-        uid = session.get('uid')
-        if uid:
-            insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d"), uid)
+        if session.get('uid'):
+            insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d"), session.get('uid'))
         else:
             insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d") )
     except KeyError as e:
