@@ -77,6 +77,7 @@ def processing_data():
 
     # Obtenir la classe prédite (0 ou 1)
     predicted_class = (prediction > 0.5).astype("int32")
+    print("predicted_class", predicted_class)
 
     # Afficher la classe prédite et la probabilité correspondante
     print(f"Classe prédite : {predicted_class[0][0]}")
@@ -91,7 +92,7 @@ def processing_data():
         doctolib_url = f"https://www.doctolib.fr/oncologue/{region.replace(' ', '-').lower()}"
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
-    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], prediction.tolist())
+    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]))
     
     pourcentage_prediction = round(100 * float(f"{prediction[0][0]:.4f}"), 1)
 
