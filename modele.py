@@ -9,6 +9,7 @@ from keras.models import save_model
 from datetime import datetime
 from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
+import joblib  # Pour sauvegarder le scaler
 
 # Fonction pour entraîner un modèle IA avec Keras et sauvegarder en .h5
 def train_model_from_mongo(target_column):
@@ -32,6 +33,11 @@ def train_model_from_mongo(target_column):
     # 4. Normaliser les caractéristiques
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
+
+    # Sauvegarder le scaler pour utilisation future
+    scaler_filename = "scaler.pkl"
+    joblib.dump(scaler, scaler_filename)
+    print(f"Scaler sauvegardé sous le nom : {scaler_filename}")
 
     # 5. Diviser les données en ensembles d'entraînement et de test
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
@@ -79,8 +85,6 @@ def train_model_from_mongo(target_column):
     save_model(model, model_filename)
     print(f"Modèle enregistré sous le nom : {model_filename}")
     
-
-
     # 10. Retourner le modèle entraîné
     return model
 
