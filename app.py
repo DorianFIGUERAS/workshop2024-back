@@ -166,5 +166,10 @@ def processing_data():
                     "avertissement": "Ceci est une prédiction basée sur un modèle de machine learning et ne remplace pas un avis médical professionnel."
                     })  # Convertir la prédiction en liste pour JSON
 
+@app.route(f'{route}/logout', methods=['GET'])
+def logout():
+    session.pop('uid', None)
+    return jsonify({"message": "Déconnexion réussie."})
+
 if __name__ == '__main__':
     app.run(port=8000)
