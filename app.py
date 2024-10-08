@@ -15,7 +15,10 @@ app = Flask(__name__)
 
 
 current_date = datetime.now().strftime("%Y-%m-%d")
+
+# Charger le modèle et le scaler
 model = load_model(f"model_{current_date}.h5")
+scaler = joblib.load("scaler.pkl")
 
 @app.route('/data', methods=['POST'])
 def processing_data():
@@ -40,14 +43,11 @@ def processing_data():
             data['Resistin'], 
             data['MCP.1']
         ]
+        region = data['region']
     except KeyError as e:
         return jsonify({"error": f"Clé manquante dans les données JSON : {e}"}), 400
 
-    current_date = datetime.now().strftime("%Y-%m-%d")
-
-    # Charger le modèle et le scaler
-    model = load_model(f"model_{current_date}.h5")
-    scaler = joblib.load("scaler.pkl")
+    
 
     # Convertir en DataFrame
     df_new = pd.DataFrame([features])
@@ -70,9 +70,16 @@ def processing_data():
     else:
         prediction_text = "Vous semblez avoir potentiellement un cancer. Vous pouvez consulter un médecin pour plus de détails et de tests."
     
+    if 'region' in data:
+        doctolib_url = f"https://www.doctolib.fr/oncologue/{region.replace(' ', '-').lower()}"
+    else:
+        doctolib_url = "https://www.doctolib.fr/oncologue"
     insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP.1'], prediction.tolist())
     # 6. Retourner la prédiction sous forme de JSON
-    return jsonify({"prediction": prediction_text, "probabilite": f"prediction[0][0]:.4f"})  # Convertir la prédiction en liste pour JSON
+    return jsonify({"prediction": prediction_text,
+                    "probabilite": f"{prediction[0][0]:.4f}",
+                    "doctolib_url": doctolib_url
+                    })  # Convertir la prédiction en liste pour JSON
 
 if __name__ == '__main__':
     app.run(debug=True)
