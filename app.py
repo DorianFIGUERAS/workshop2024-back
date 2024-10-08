@@ -58,7 +58,7 @@ def processing_data():
             data['Leptin'], 
             data['Adiponectin'], 
             data['Resistin'], 
-            data['MCP.1']
+            data['MCP-1']
         ]
         region = data['region']
     except KeyError as e:
@@ -91,10 +91,13 @@ def processing_data():
         doctolib_url = f"https://www.doctolib.fr/oncologue/{region.replace(' ', '-').lower()}"
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
-    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP.1'], prediction.tolist())
+    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], prediction.tolist())
+    
+    pourcentage_prediction = round(100 * float(f"{prediction[0][0]:.4f}"), 1)
+
     # 6. Retourner la prédiction sous forme de JSON
     return jsonify({"prediction": prediction_text,
-                    "probabilite": f"{prediction[0][0]:.4f}",
+                    "probabilite": f"{pourcentage_prediction} %",
                     "doctolib_url": doctolib_url
                     })  # Convertir la prédiction en liste pour JSON
 

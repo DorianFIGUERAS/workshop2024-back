@@ -17,7 +17,7 @@ def insertion_bdd(age, bmi, glucose, insulin, homa, leptin, adiponectin, resisti
     collection = db[os.getenv("COLLECTION_INSERT")]
 
     # 4. Insérer un document dans la collection
-    document = {"Age": age, "BMI": bmi, "Glucose": glucose, "Insulin": insulin, "HOMA":homa, "Leptin":leptin, "Adiponectin":adiponectin, "Resistin":resistin, "MCP.1":mcp1, "Classification": classification}
+    document = {"Age": age, "BMI": bmi, "Glucose": glucose, "Insulin": insulin, "HOMA":homa, "Leptin":leptin, "Adiponectin":adiponectin, "Resistin":resistin, "MCP-1":mcp1, "Classification": classification}
     insert_result = collection.insert_one(document)
     print(f"Document inséré avec ID : {insert_result.inserted_id}")
 

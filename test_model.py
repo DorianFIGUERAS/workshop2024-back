@@ -52,6 +52,7 @@ prediction = model.predict(new_data_scaled)
 # Obtenir la classe prédite (0 ou 1)
 predicted_class = (prediction > 0.5).astype("int32")
 
+pourcentage_prediction = round(100 * float(f"{prediction[0][0]:.4f}"), 1)
 # Afficher la classe prédite et la probabilité correspondante
 print(f"Classe prédite : {predicted_class[0][0]}")
-print(f"Probabilité : {prediction[0][0]:.4f}")
+print(f"Probabilité : {pourcentage_prediction} %")
