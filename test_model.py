@@ -1,9 +1,12 @@
 import pandas as pd
 import joblib
 from keras.models import load_model
+from datetime import datetime
+
+current_date = datetime.now().strftime("%Y-%m-%d")
 
 # Charger le modèle et le scaler
-model = load_model("model_2024-10-08.h5")
+model = load_model(f"model_{current_date}.h5")
 scaler = joblib.load("scaler.pkl")
 
 # Exemple de nouvelles données
