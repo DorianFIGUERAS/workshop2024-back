@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from keras.models import load_model
 from datetime import datetime
 from insertion_BDD import insertion_bdd
+from connexion_firebase import authenticate_user
+from connexion_bdd_user import requete_bdd_user
 
 
 import numpy as np
@@ -10,9 +12,13 @@ import joblib
 import pandas as pd
 
 
+
+
 app = Flask(__name__)
 
 
+# Définir une clé secrète pour les sessions Flask
+app.secret_key = os.urandom(24)
 
 # Récupérer la liste des noms des modèles dans le dossier models
 model_files = [f for f in os.listdir("./models") if f.endswith(".h5")]
@@ -36,6 +42,39 @@ current_date = datetime.now().strftime("%Y%m%d")
 # Charger le modèle et le scaler
 model = load_model(f"./models/{latest_model_file}")
 scaler = joblib.load("scaler.pkl")
+
+
+@app.route('/connexion', methods=['POST', 'GET'])
+def authenticate():
+    data = request.get_json()
+    try : 
+        email = data['email']
+        password = data['password']
+        authentification = authenticate_user(email, password)
+        if authentification :
+            session['uid'] = authentification
+            return jsonify({"uid": authentification})
+        else:
+            return jsonify({"error": "L'authentification a échoué."}), 400
+    except KeyError as e:
+        return jsonify({"error": f"Clé manquante dans les données JSON : {e}"}), 400
+
+@app.route('/resultats', methods=['GET'])
+def resultats():
+    try : 
+        uid = session.get('uid')
+        if uid :
+            print("uid", uid)
+            resultats = requete_bdd_user(uid)
+            print("resultats", resultats)
+            return jsonify({"resultats": resultats})
+        else:
+            print("uid", uid)
+            resultats = requete_bdd_user(uid)
+            print("resultats", resultats)
+            return jsonify({"resultats": resultats})
+    except KeyError as e:
+        return jsonify({f"error": "{e}"}), 400
 
 @app.route('/data', methods=['POST'])
 def processing_data():
@@ -92,7 +131,9 @@ def processing_data():
         doctolib_url = f"https://www.doctolib.fr/oncologue/{region.replace(' ', '-').lower()}"
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
-    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]))
+    
+    insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), session['uid'], datetime.now().strftime("%Y-%m-%d") )
+    
     
     pourcentage_prediction = round(100 * float(f"{prediction[0][0]:.4f}"), 1)
 
