@@ -1,0 +1,66 @@
+# Projet Back-end
+
+## Installation
+
+Suivez les étapes ci-dessous pour installer et configurer le projet sur votre machine locale.
+
+### Prérequis
+
+- [python](https://www.python.org/downloads/)
+- [pip](https://www.python.org/downloads/)
+
+
+Créer un fichier `.env` contenant les informations suivantes : 
+MONGO_URI=<Uri_de_la_base_de_donnees_MongoDB>
+COLLECTION=<collection_utilisable_de_la_bdd_Mongo_DB>
+COLLECTION_USER=<Collection_specfique_a_l'utilisateur_pour_enregistrer_ses_donnees>
+DATABASE=<Nom_de_la_base_de_donnees>
+API_KEY_FIREBASE=<clé_web_api_firebase_pour_l'auhtentification>
+ROUTE=/back_end
+SECRET_KEY=<clé_secrète_a_choisir_pour_fixer_les_sessions_utilisateurs_de-l'api_flask>
+
+### Étapes d'installation
+
+1. **Clonez le dépôt**
+
+    ```bash
+    git clone https://github.com/DorianFIGUERAS/MSPR_BACK
+    ```
+
+2. **Accédez au répertoire du projet**
+
+    ```bash
+    cd back_end
+    ```
+
+3. **Installez les dépendances**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+5. **Démarrez le serveur**
+
+    ```bash
+    python app.py
+    ```
+
+### Utilisation
+
+Après avoir démarré le serveur, vous pouvez accéder à l'application via `http://localhost:8000`.
+
+### Conteneurisation
+
+    ```bash
+    docker build -t <nom_image>:<tag>
+    ```
+
+    ```bash
+    docker run -d -p <port_machine>:8000 <nom_image>:<tag>
+    ```
+
+### accessibilité de l'api
+
+L'api sera disponible via : http://localhost:8000/back_end , suivi des différents pathPrefix définis dans le fichier app.py
+
+
