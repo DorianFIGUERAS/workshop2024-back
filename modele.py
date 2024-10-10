@@ -89,4 +89,4 @@ def train_model_from_mongo(target_column):
     return model
 
 # Entraîner le modèle avec la colonne cible 'Classification'
-# model = train_model_from_mongo(target_column='Classification')
+model = train_model_from_mongo(target_column='Classification')

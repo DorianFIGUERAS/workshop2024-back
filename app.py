@@ -6,7 +6,7 @@ from connexion_firebase import authenticate_user
 from connexion_bdd_user import requete_bdd_user
 from creation_user import create_user
 from dotenv import load_dotenv
-
+from flask_cors import CORS
 
 import numpy as np
 import os
@@ -17,6 +17,8 @@ import pandas as pd
 
 
 app = Flask(__name__)
+
+CORS(app)
 
 load_dotenv()
 route = os.getenv('ROUTE')
@@ -147,10 +149,8 @@ def processing_data():
     else:
         doctolib_url = "https://www.doctolib.fr/oncologue"
     try:
-        if session.get('uid'):
-            insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d"), session.get('uid'))
-        else:
-            insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d") )
+        insertion_bdd(data['Age'], data['BMI'], data['Glucose'], data['Insulin'], data['HOMA'], data['Leptin'], data['Adiponectin'], data['Resistin'], data['MCP-1'], int(predicted_class[0][0]), datetime.now().strftime("%Y-%m-%d"), session.get('uid'))
+        
     except KeyError as e:
         uid = None
     
@@ -172,4 +172,4 @@ def logout():
     return jsonify({"message": "Déconnexion réussie."})
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(debug=True, port=8000)

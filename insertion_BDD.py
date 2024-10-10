@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-def insertion_bdd(age, bmi, glucose, insulin, homa, leptin, adiponectin, resistin, mcp1, classification, date, uid=None):
+def insertion_bdd(age, bmi, glucose, insulin, homa, leptin, adiponectin, resistin, mcp1, classification, date, uid):
     # 1. Se connecter à MongoDB
     # Remplacez <username>, <password> et <host> par vos informations MongoDB
     mongo_uri = os.getenv("MONGO_URI")

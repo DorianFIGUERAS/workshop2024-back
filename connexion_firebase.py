@@ -18,6 +18,7 @@ def authenticate_user(email, password):
     response = requests.post(url, json=payload)
     if response.status_code == 200:
         user_data = response.json()
+        print("user_data", user_data['localId'])
         return user_data['localId']
     else:
         print(f'Error authenticating user: {response.json().get("error", {}).get("message", "Unknown error")}')
